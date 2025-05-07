@@ -43,13 +43,24 @@ python app.py
 
 ### Task 1: Define the Problem
 
+We need to prevent users who are not logged in from accessing documents.
+
 ### Task 2: Determine the Design
+
+We need to check in each document route to see if a user is logged in.
+
+Based on whether a user is logged in or not, we will return the document or 
+a 401 (Unauthorized) status code.
+
+> Note, if the user was logged in but we wanted to restrict them based on role
+  permissions (like admin), we would use a 403 (Forbidden) - authenticated but
+  not authorized - response.
 
 ### Task 3: Develop, Test, and Refine the Code
 
-#### First Pass: Manual Checks
+#### Step 1: Refactor Logic to Return 401 if Not Logged In
 
-Let's say we have a `Document` resource. Its `get()` method looks like this:
+We currently have a `Document` resource defined in `app.py`. Its `get()` method looks like this:
 
 ```py
 class Document(Resource):
@@ -82,11 +93,9 @@ class Document(Resource):
 Unless the session includes `user_id`, we return an error. In this case, if a
 user isn't logged in, we return `401 Unauthorized`.
 
-***
+#### Step 2: Implement For All Protected Routes
 
-#### Refactor
-
-This code works fine, so you use it in a few places. Now your
+Next, implement the same logic for all the document routes. Now your
 `Document` resource looks like this:
 
 ```py
@@ -113,6 +122,8 @@ class Document(Resource):
 
         # delete code
 ```
+
+#### Step 3: Refactor with `before_request`
 
 That doesn't look so DRY. Wouldn't it be great if there were a way to ask Flask
 to run some code **before** any **action**?
@@ -146,9 +157,7 @@ in Flask act upon objects that manipulate the `request` context _automatically_.
 This means that if an object is configured to do anything to a request, our
 `before_request` hook will be executed first.
 
-***
-
-#### Skipping Filters for Certain Endpoints
+#### Step 4: Skipping Filters for Certain Endpoints
 
 What if we wanted to let anyone see a list of documents, but keep the
 `before_request` hook for the `Document` methods? We could do this:
@@ -190,7 +199,7 @@ string `endpoint`. This is set automatically to the lowercase version of the
 class or function name, but it's often best to be explicit and name it when we
 add our resources.
 
-#### Step x: Commit and Push Git History
+#### Step 5: Commit and Push Git History
 
 * Commit and push your code:
 
@@ -221,3 +230,23 @@ check the `user_id` in the session and only authorize users to run those
 actions if they are logged in.
 
 ## Considerations
+
+### Authorization ≠ Authentication
+
+A user may be authenticated (known to the system) but not authorized to perform an action (e.g., not an admin).
+* 401 Unauthorized = not authenticated
+* 403 Forbidden = authenticated but not permitted
+
+### Global Filters Can Overreach
+
+Flask's @before_request is powerful—but applies to every route by default. It’s easy to unintentionally block
+public routes like /login, /register, or /home unless those endpoints are explicitly skipped.
+
+In development and testing, you may want to log or print the request.endpoint to debug unexpected denials.
+
+### Role-Based Permissions
+
+The current logic only checks for the presence of user_id. In real-world applications, roles (e.g., admin,
+editor) or ownership (e.g., this is my document) are often used to fine-tune authorization.
+
+Consider: What would we need to add to the application to limit document deletion to the document's author?
