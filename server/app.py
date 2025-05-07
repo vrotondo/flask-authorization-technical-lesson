@@ -51,6 +51,34 @@ class Document(Resource):
         document = Document.query.filter(Document.id == id).first()
         return DocumentSchema().dump(document)
 
+    def patch(self, id):
+        document = Document.query.filter(Document.id == id).first()
+        for attr in request.form:
+            setattr(record, attr, request.form[attr])
+
+        db.session.add(document)
+        db.session.commit()
+
+        response = make_response(
+            DocumentSchema().dump(document),
+            200
+        )
+
+        return response
+
+    def delete(self, id):
+        document = Document.query.filter(Document.id == id).first()
+        
+        db.session.delete(document)
+        db.session.commit()
+
+        response = make_response(
+            {"message": "document successfully deleted"},
+            200
+        )
+
+        return response 
+
 
 api.add_resource(Login, '/login')
 api.add_resource(CheckSession, '/check_session')
