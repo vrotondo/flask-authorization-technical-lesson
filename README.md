@@ -15,7 +15,29 @@ their own blog posts. In this lesson, we'll learn how we can use the session
 object to authenticate users' requests, and give them explicit permission to
 access certain routes in our application.
 
+## Tools & Resources
+
+- [GitHub Repo](https://github.com/learn-co-curriculum/flask-authorization-technical-lesson)
+- [Flask RESTful Documentation](https://flask-restful.readthedocs.io/en/latest/quickstart.html)
+
 ## Set Up
+
+There is some starter code in place for a Flask API backend.
+To get set up, run:
+
+```bash
+pipenv install
+pipenv shell
+cd server
+flask db upgrade
+python seed.py
+```
+
+You can run the Flask server with:
+
+```bash
+python app.py
+```
 
 ## Instructions
 

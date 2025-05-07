@@ -18,7 +18,44 @@ db.init_app(app)
 
 api = Api(app)
 
+class Login(Resource):
 
+    def post(self):
+        user = User.query.filter(
+            User.username == request.get_json()['username']
+        ).first()
+        
+        if user:
+            session['user_id'] = user.id
+            return UserSchema().dump(user)
+        else:
+            return {'message': 'Invalid login'}, 401
+
+class CheckSession(Resource):
+
+    def get(self):
+        user = User.query.filter(User.id == session.get('user_id')).first()
+        if user:
+            return UserSchema().dump(user)
+        else:
+            return {'message': '401: Not Authorized'}, 401
+
+class Logout(Resource):
+
+    def delete(self):
+        session['user_id'] = None
+        return {'message': '204: No Content'}, 204
+
+class Document(Resource):
+    def get(self, id):
+        document = Document.query.filter(Document.id == id).first()
+        return DocumentSchema().dump(document)
+
+
+api.add_resource(Login, '/login')
+api.add_resource(CheckSession, '/check_session')
+api.add_resource(Logout, '/logout')
+api.add_resource(Document, '/documents/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

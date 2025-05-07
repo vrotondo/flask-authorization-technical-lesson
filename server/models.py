@@ -17,6 +17,23 @@ class User(db.Model):
     def __repr__(self):
         return f'User {self.username}, ID {self.id}'
 
+class Document(db.Model):
+    __tablename__ = 'documents'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String)
+    content = db.Column(db.String)
+
+    def __repr__(self):
+        return f'Document {self.title}, ID {self.id}'
+
 class UserSchema(Schema):
     id = fields.Int()
     username = fields.String()
+
+
+class DocumentSchema(Schema):
+    id = fields.Int()
+    title = fields.String()
+    content = fields.String()
+
