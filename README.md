@@ -33,7 +33,7 @@ Let's say we have a `Document` resource. Its `get()` method looks like this:
 class Document(Resource):
     def get(self, id):
         document = Document.query.filter(Document.id == id).first()
-        return document.to_dict()
+        return DocumentSchema().dump(document)
 
 ```
 
@@ -53,7 +53,7 @@ class Document(Resource):
             return {'error': 'Unauthorized'}, 401
 
         document = Document.query.filter(Document.id == id).first()
-        return document.to_dict()
+        return DocumentSchema().dump(document)
 
 ```
 
@@ -75,7 +75,7 @@ class Document(Resource):
             return {'error': 'Unauthorized'}, 401
 
         document = Document.query.filter(Document.id == id).first()
-        return document.to_dict()
+        return DocumentSchema().dump(document)
 
     def patch(self, id):
 
@@ -108,7 +108,7 @@ class Document(Resource):
     def get(self, id):
 
         document = Document.query.filter(Document.id == id).first()
-        return document.to_dict()
+        return DocumentSchema().dump(document)
 
     def patch(self, id):
 
@@ -142,7 +142,7 @@ class Document(Resource):
     def get(self, id):
 
         document = Document.query.filter(Document.id == id).first()
-        return document.to_dict()
+        return DocumentSchema().dump(document)
 
     def patch(self, id):
 
@@ -156,7 +156,7 @@ class DocumentList(Resource):
     def get(self):
         
         documents = Document.query.all()
-        return [document.to_dict() for document in documents]
+        return [DocumentSchema().dump(document) for document in documents]
 
 api.add_resource(Document, '/documents/<int:id>', endpoint='document')
 api.add_resource(DocumentList, '/documents', endpoint='document_list')
