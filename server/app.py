@@ -46,12 +46,25 @@ class Logout(Resource):
         session['user_id'] = None
         return {'message': '204: No Content'}, 204
 
+@app.before_request
+def check_if_logged_in():
+    if not session['user_id']:
+        return {'error': 'Unauthorized'}, 401
+
 class Document(Resource):
     def get(self, id):
+
+        if not session['user_id']:
+            return {'error': 'Unauthorized'}, 401
+
         document = Document.query.filter(Document.id == id).first()
         return DocumentSchema().dump(document)
 
     def patch(self, id):
+
+        if not session['user_id']:
+            return {'error': 'Unauthorized'}, 401
+
         document = Document.query.filter(Document.id == id).first()
         for attr in request.form:
             setattr(record, attr, request.form[attr])
@@ -67,6 +80,10 @@ class Document(Resource):
         return response
 
     def delete(self, id):
+
+        if not session['user_id']:
+            return {'error': 'Unauthorized'}, 401
+
         document = Document.query.filter(Document.id == id).first()
         
         db.session.delete(document)
